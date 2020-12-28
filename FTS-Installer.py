@@ -5,11 +5,13 @@ import os
 
 def install_pip():
     pip = subprocess.run(["apt", "install", "python3-pip"], capture_output=True)
+    print(pip)
     return pip.returncode
 
 
 def install_fts():
-    pip = subprocess.run(["python3", "pip","install", "FreeTAKServer"], capture_output=True)
+    pip = subprocess.run(["python3", "pip", "install", "FreeTAKServer"], capture_output=True)
+    print(pip)
     return pip.returncode
 
 
@@ -29,11 +31,13 @@ def link_dir():
 def install_python_libraries():
     pylibs = subprocess.run(["apt", "install", "python3-dev", "python3-setuptools", "build-essential", "python3-gevent",
                            "python3-lxml", "libcairo2-dev"], capture_output=True)
+    print(pylibs)
     return pylibs.returncode
 
 
 def install_pip_modules():
     pip = subprocess.run(["python3", "pip", "install", "wheel", "pycairo"], capture_output=True)
+    print(pip)
     return pip.returncode
 
 
