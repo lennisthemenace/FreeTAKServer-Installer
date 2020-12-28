@@ -68,10 +68,10 @@ if __name__ == '__main__':
         print("Something went wrong!")
         exit(1)
     print("------------------------------")
-    print("Installing python libraries")
-    if install_python_libraries() != 0:
-        print("Something went wrong!")
-        exit(1)
+    #print("Installing python libraries")
+    #if install_python_libraries() != 0:
+    #    print("Something went wrong!")
+    #    exit(1)
     print("------------------------------")
     print("Installing pip modules")
     if install_pip_modules() != 0:
