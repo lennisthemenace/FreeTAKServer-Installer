@@ -33,7 +33,7 @@ def install_python_libraries():
 
 
 def install_pip_modules():
-    pip = subprocess.run(["python3", "pip", "wheel", "pycairo"], capture_output=True)
+    pip = subprocess.run(["python3", "pip", "install", "wheel", "pycairo"], capture_output=True)
     return pip.returncode
 
 
