@@ -61,9 +61,9 @@ def install_service():
     with open('/etc/systemd/system/FreeTAKServer.service', 'w') as service_file:
         service_file.write(service)
 
-    subprocess.run(["systemd", "daemon-reload"], capture_output=True)
-    subprocess.run(["systemd", "enable", "FreeTAKServer.service"], capture_output=True)
-    sysd = subprocess.run(["systemd", "start", "FreeTAKServer.service"], capture_output=True)
+    #subprocess.run(["systemd", "daemon-reload"], capture_output=True)
+    subprocess.run(["systemctl", "enable", "FreeTAKServer.service"], capture_output=True)
+    sysd = subprocess.run(["systemctl", "start", "FreeTAKServer.service"], capture_output=True)
     return sysd.returncode
 
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     #if install_python_libraries() != 0:
     #    print("Something went wrong!")
     #    exit(1)
-    print("------------------------------")
+    #print("------------------------------")
     print("Installing pip modules")
     if install_pip_modules() != 0:
         print("Something went wrong!")
