@@ -10,7 +10,7 @@ def install_pip():
 
 
 def install_fts():
-    pip = subprocess.run(["python3", "pip", "install", "FreeTAKServer"], capture_output=True)
+    pip = subprocess.run(["pip3", "install", "FreeTAKServer"], capture_output=True)
     print(pip)
     return pip.returncode
 
@@ -36,7 +36,7 @@ def install_python_libraries():
 
 
 def install_pip_modules():
-    pip = subprocess.run(["python3", "pip", "install", "wheel", "pycairo"], capture_output=True)
+    pip = subprocess.run(["pip3", "install", "wheel", "pycairo"], capture_output=True)
     print(pip)
     return pip.returncode
 
