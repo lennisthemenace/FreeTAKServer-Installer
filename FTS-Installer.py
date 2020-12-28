@@ -1,4 +1,3 @@
-from jinja2 import Template
 import subprocess
 import os
 
@@ -42,7 +41,7 @@ def install_pip_modules():
 
 
 def install_service():
-    system_d_file_template = Template("""[Unit]
+    system_d_file_template = """[Unit]
     Description=FreeTAK Server Service
     After=network.target
     StartLimitIntervalSec=0
@@ -55,13 +54,11 @@ def install_service():
     
     [Install]
     WantedBy=multi-user.target
-    """)
-    service = system_d_file_template.render()
+    """
 
     with open('/etc/systemd/system/FreeTAKServer.service', 'w') as service_file:
-        service_file.write(service)
+        service_file.write(system_d_file_template)
 
-    #subprocess.run(["systemd", "daemon-reload"], capture_output=True)
     subprocess.run(["systemctl", "enable", "FreeTAKServer.service"], capture_output=True)
     sysd = subprocess.run(["systemctl", "start", "FreeTAKServer.service"], capture_output=True)
     return sysd.returncode
