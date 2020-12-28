@@ -1,4 +1,3 @@
-from pip._internal import main as pipmain
 from jinja2 import Template
 import subprocess
 import os
@@ -10,7 +9,8 @@ def install_pip():
 
 
 def install_fts():
-    return pipmain(['install', 'FreeTAKServer'])
+    pip = subprocess.run(["python3", "pip", "FreeTAKServer"], capture_output=True)
+    return pip.returncode
 
 
 def link_dir():
@@ -33,7 +33,8 @@ def install_python_libraries():
 
 
 def install_pip_modules():
-    return pipmain(['install', 'wheel', 'pycairo'])
+    pip = subprocess.run(["python3", "pip", "wheel", "pycairo"], capture_output=True)
+    return pip.returncode
 
 
 def install_service():
