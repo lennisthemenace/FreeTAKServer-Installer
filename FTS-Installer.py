@@ -9,7 +9,7 @@ def install_pip():
 
 
 def install_fts():
-    pip = subprocess.run(["python3", "pip", "FreeTAKServer"], capture_output=True)
+    pip = subprocess.run(["python3", "pip","install", "FreeTAKServer"], capture_output=True)
     return pip.returncode
 
 
