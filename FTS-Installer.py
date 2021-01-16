@@ -1,7 +1,7 @@
 import subprocess
 import os
 import getpass
-VERSION = "0.2.1"
+VERSION = "0.2.2"
 
 
 def add_to_cron():
@@ -28,7 +28,7 @@ def install_pip():
 
 
 def install_fts():
-    pip = subprocess.run(["pip3", "install", "FreeTAKServer"], capture_output=True)
+    pip = subprocess.run(["pip3", "install", "FreeTAKServer==1.3.0.6"], capture_output=True)
     print(pip)
     return pip.returncode
 
