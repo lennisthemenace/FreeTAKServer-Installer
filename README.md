@@ -7,6 +7,10 @@ Just run:
 
 `curl -L https://git.io/JLSRp | sudo python3 -`
 
+Reboot (this will ensure FTS is running for the next step):
+
+`sudo reboot`
+
 Then run the atakofthecerts script from [here](https://github.com/lennisthemenace/ATAK-Certs) to generate the needed certificate for FTS to run. (Changing the SERVER_IP for the ip address clients use for connecting):
 
 `curl -L https://git.io/JL9DP | sudo python3 - -a -c -i SERVER_IP`
