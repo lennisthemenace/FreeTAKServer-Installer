@@ -1,7 +1,8 @@
 import subprocess
 import os
 import getpass
-VERSION = "0.2.2"
+
+VERSION = "0.3"
 
 
 def add_to_cron():
@@ -14,6 +15,8 @@ def add_to_cron():
         cron = CronTab(user=getpass.getuser())
         job = cron.new(command='nohup sudo python3 -m FreeTAKServer.controllers.services.FTS &')
         job.every_reboot()
+        job2 = cron.new(command='nohup sudo python3 /usr/local/lib/python3.8/dist-packages/FreeTAKServer-UI/run.py &')
+        job2.every_reboot()
         cron.write()
     except Exception:
         return 1
@@ -28,7 +31,7 @@ def install_pip():
 
 
 def install_fts():
-    pip = subprocess.run(["pip3", "install", "FreeTAKServer==1.3.0.6"], capture_output=True)
+    pip = subprocess.run(["pip3", "install", "FreeTAKServer[ui]"], capture_output=True)
     print(pip)
     return pip.returncode
 
@@ -48,7 +51,7 @@ def link_dir():
 
 def install_python_libraries():
     pylibs = subprocess.run(["apt", "install", "python3-dev", "python3-setuptools", "build-essential", "python3-gevent",
-                           "python3-lxml", "libcairo2-dev", "-y"], capture_output=True)
+                             "python3-lxml", "libcairo2-dev", "-y"], capture_output=True)
     print(pylibs)
     return pylibs.returncode
 
@@ -64,13 +67,13 @@ def install_service():
     Description=FreeTAK Server Service
     After=network.target
     StartLimitIntervalSec=0
-    
+
     [Service]
     Type=simple
     Restart=always
     RestartSec=1
     ExecStart=/usr/bin/python3 -m FreeTAKServer.controllers.services.FTS -DataPackageIP 0.0.0.0 -AutoStart True
-    
+
     [Install]
     WantedBy=multi-user.target
     """
