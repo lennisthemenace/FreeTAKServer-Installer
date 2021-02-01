@@ -41,8 +41,10 @@ def link_dir():
     python38_fts_path = "/usr/local/lib/python3.8/dist-packages/FreeTAKServer"
     if os.path.exists(python37_fts_path):
         os.symlink(python37_fts_path, "./FTS", target_is_directory=True)
+        os.symlink(python37_fts_path + "-UI", "./FTS-UI", target_is_directory=True)
     elif os.path.exists(python38_fts_path):
         os.symlink(python38_fts_path, "./FTS", target_is_directory=True)
+        os.symlink(python38_fts_path + "-UI", "./FTS-UI", target_is_directory=True)
     else:
         print("Cannot find FreeTAKServer Folder, it may have not been installed")
         return False
