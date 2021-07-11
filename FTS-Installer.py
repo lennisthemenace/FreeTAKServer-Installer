@@ -4,6 +4,11 @@ import getpass
 
 VERSION = "0.3"
 
+WEBMAP_VERSION = "0.2.5"
+
+WEBMAP_URL = f"https://github.com/FreeTAKTeam/FreeTAKHub/releases/download/v{WEBMAP_VERSION}/FTH-webmap-linux-{WEBMAP_VERSION}.zip"
+
+DEFAULT_WEBMAP_LOCATION = "/opt/"
 
 def add_to_cron():
     try:
@@ -63,9 +68,16 @@ def install_pip_modules():
     print(pip)
     return pip.returncode
 
+def install_webmap():
+    webmap_location = input(f"where do you want the webmap installed [{DEFAULT_WEBMAP_LOCATION}] ?")
+    if not webmap_location:
+        webmap_location = DEFAULT_WEBMAP_LOCATION
+    webmap_download = subprocess.run(["wget", WEBMAP_URL, f"-O {webmap_location}"], capture_output=True)
+    print(webmap_download)
+    subprocess.run(["unzip", webmap_location])
 
 def install_service():
-    system_d_file_template = """[Unit]
+    system_d_file_template = f"""[Unit]
     Description=FreeTAK Server Service
     After=network.target
     StartLimitIntervalSec=0
@@ -75,6 +87,7 @@ def install_service():
     Restart=always
     RestartSec=1
     ExecStart=/usr/bin/python3 -m FreeTAKServer.controllers.services.FTS -DataPackageIP 0.0.0.0 -AutoStart True
+    ExecStart=.{webmap_location}
 
     [Install]
     WantedBy=multi-user.target
