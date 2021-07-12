@@ -2,10 +2,33 @@ import subprocess
 import os
 import getpass
 
-VERSION = "0.3"
+VERSION = "0.4"
 
 
-def add_to_cron():
+def install_rtsp():
+    wget = subprocess.run(["wget", "-O", "/opt/rtsp-simple-server.tar.gz", "https://github.com/aler9/rtsp-simple-server/releases/download/v0.16.4/rtsp-simple-server_v0.16.4_linux_amd64.tar.gz"], capture_output=True)
+    print(wget)
+    tar = subprocess.run(["tar", "-xvf", "/opt/rtsp-simple-server.tar.gz"])
+    return tar.returncode
+
+
+def add_rtsp_to_cron():
+    try:
+        from crontab import CronTab
+    except ImportError:
+        subprocess.run(["pip3", "install", "python-crontab"], capture_output=True)
+    from crontab import CronTab
+    try:
+        cron = CronTab(user=getpass.getuser())
+        job = cron.new(command='nohup sudo /opt/rtsp-simple-server &')
+        job.every_reboot()
+        cron.write()
+    except Exception:
+        return 1
+    return 0
+
+
+def add_fts_to_cron():
     try:
         from crontab import CronTab
     except ImportError:
@@ -115,13 +138,22 @@ if __name__ == '__main__':
     #     exit(1)
     # print("------------------------------")
     print("Adding FreeTAKServer as a cron job")
-    if add_to_cron() != 0:
+    if add_fts_to_cron() != 0:
         print("Something went wrong!")
         exit(1)
     print("------------------------------")
     print("Creating symlinked directory to ./FTS")
     if link_dir() != 0:
         print("Something went wrong!")
+    print("------------------------------")
+    print("FTS is Now Installed")
+    print("------------------------------")
+    rtsp_question = input("Would you like to install the RTSP server? y/n")
+    if rtsp_question.lower() == "y":
+        if install_rtsp() == 0:
+            if add_rtsp_to_cron() == 0:
+                print("RTSP Server installed")
+
     print("------------------------------")
     print("------------------------------")
     print("---------Finished!------------")
