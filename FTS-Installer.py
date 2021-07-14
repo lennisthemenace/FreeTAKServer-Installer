@@ -10,9 +10,12 @@ WEBMAP_URL = f"https://github.com/FreeTAKTeam/FreeTAKHub/releases/download/v{WEB
 
 DEFAULT_WEBMAP_LOCATION = "/opt/"
 
+using_webmap = False
+
+
 def add_to_cron():
     try:
-        from crontab import CronTab
+        from crontab import CronTabs
     except ImportError:
         subprocess.run(["pip3", "install", "python-crontab"], capture_output=True)
     from crontab import CronTab
@@ -22,6 +25,8 @@ def add_to_cron():
         job.every_reboot()
         job2 = cron.new(command='nohup sudo python3 /usr/local/lib/python3.8/dist-packages/FreeTAKServer-UI/run.py &')
         job2.every_reboot()
+        job3 = cron.new(command=f'nohup sudo /opt/webmap/FTH-webmap-linux-{WEBMAP_VERSION} &')
+        job3.every_reboot()
         cron.write()
     except Exception:
         return 1
@@ -47,9 +52,11 @@ def link_dir():
     if os.path.exists(python37_fts_path):
         os.symlink(python37_fts_path, "./FTS", target_is_directory=True)
         os.symlink(python37_fts_path + "-UI", "./FTS-UI", target_is_directory=True)
+        if using_webmap: os.symlink(webmap_location+f"webmap/FTH-webmap-linux-{WEBMAP_VERSION}", "./FTS-WEBMAP", target_is_directory=True)
     elif os.path.exists(python38_fts_path):
         os.symlink(python38_fts_path, "./FTS", target_is_directory=True)
         os.symlink(python38_fts_path + "-UI", "./FTS-UI", target_is_directory=True)
+        if using_webmap: os.symlink(webmap_location+f"webmap/FTH-webmap-linux-{WEBMAP_VERSION}", "./FTS-WEBMAP", target_is_directory=True)
     else:
         print("Cannot find FreeTAKServer Folder, it may have not been installed")
         return False
@@ -68,13 +75,19 @@ def install_pip_modules():
     print(pip)
     return pip.returncode
 
+
 def install_webmap():
+    global webmap_location
     webmap_location = input(f"where do you want the webmap installed [{DEFAULT_WEBMAP_LOCATION}] ?")
     if not webmap_location:
         webmap_location = DEFAULT_WEBMAP_LOCATION
-    webmap_download = subprocess.run(["wget", WEBMAP_URL, f"-O {webmap_location}"], capture_output=True)
+    subprocess.run(["rm", "{webmap_location}webmap.zip"])
+    subprocess.run(["rm", "-r", "{webmap_location}webmap"])
+    webmap_download = subprocess.run(["wget", f"-O{webmap_location}webmap.zip", WEBMAP_URL])
     print(webmap_download)
-    subprocess.run(["unzip", webmap_location])
+    subprocess.run(["unzip", f"{webmap_location}webmap.zip", "-d{webmap_location}webmap"])
+    subprocess.run(["chmod", f"+x{webmap_location}webmap"])
+
 
 def install_service():
     system_d_file_template = f"""[Unit]
@@ -87,7 +100,6 @@ def install_service():
     Restart=always
     RestartSec=1
     ExecStart=/usr/bin/python3 -m FreeTAKServer.controllers.services.FTS -DataPackageIP 0.0.0.0 -AutoStart True
-    ExecStart=.{webmap_location}
 
     [Install]
     WantedBy=multi-user.target
@@ -102,6 +114,11 @@ def install_service():
 
 
 if __name__ == '__main__':
+    choice = input("would you like to install the FTS webmap ? [yes]")
+    if choice == "yes" or choice == "" or choice == None:
+        using_webmap = True
+        print('installing webmap')
+        install_webmap()
     print("Installing python3 pip")
     if install_pip() != 0:
         print("Something went wrong!")
