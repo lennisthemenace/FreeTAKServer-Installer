@@ -27,8 +27,8 @@ def install_webmap():
     print(webmap_download)
     subprocess.run(["apt", "install", "unzip", "-y"])
     subprocess.run(["unzip", f"{webmap_location}webmap.zip", f"-d{webmap_location}webmap"])
-    subprocess.run(["chmod", f"+x{webmap_location}webmap"])
-    os.symlink(f"{webmap_location}webmap/FTH-webmap-linux-{WEBMAP_VERSION}", "./FTS-WEBMAP", target_is_directory=True)
+    subprocess.run(["chmod", "+x", f"{webmap_location}webmap/FTH-webmap-linux-{WEBMAP_VERSION}"])
+    os.symlink(f"{webmap_location}webmap", "./FTS-WEBMAP", target_is_directory=True)
     return 0
 
 
