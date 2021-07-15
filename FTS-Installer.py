@@ -14,8 +14,6 @@ RTSP_VERSION = "0.16.4"
 
 RTSP_URL = f"https://github.com/aler9/rtsp-simple-server/releases/download/v{RTSP_VERSION}/rtsp-simple-server_v{RTSP_VERSION}_linux_amd64.tar.gz"
 
-using_webmap = False
-
 
 def install_webmap():
     webmap_location = input(f"where do you want the webmap installed [{DEFAULT_WEBMAP_LOCATION}] ?")
