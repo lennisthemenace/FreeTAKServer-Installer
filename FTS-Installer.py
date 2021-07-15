@@ -21,13 +21,15 @@ def install_webmap():
     webmap_location = input(f"where do you want the webmap installed [{DEFAULT_WEBMAP_LOCATION}] ?")
     if not webmap_location:
         webmap_location = DEFAULT_WEBMAP_LOCATION
-    subprocess.run(["rm", "{webmap_location}webmap.zip"])
-    subprocess.run(["rm", "-r", "{webmap_location}webmap"])
+    subprocess.run(["rm", f"{webmap_location}webmap.zip"])
+    subprocess.run(["rm", "-r", f"{webmap_location}webmap"])
     webmap_download = subprocess.run(["wget", f"-O{webmap_location}webmap.zip", WEBMAP_URL])
     print(webmap_download)
-    subprocess.run(["unzip", f"{webmap_location}webmap.zip", "-d{webmap_location}webmap"])
+    subprocess.run(["apt", "install", "unzip", "-y"])
+    subprocess.run(["unzip", f"{webmap_location}webmap.zip", f"-d{webmap_location}webmap"])
     subprocess.run(["chmod", f"+x{webmap_location}webmap"])
     os.symlink(f"{webmap_location}webmap/FTH-webmap-linux-{WEBMAP_VERSION}", "./FTS-WEBMAP", target_is_directory=True)
+    return 0
 
 
 def install_rtsp():
