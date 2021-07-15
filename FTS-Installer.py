@@ -15,7 +15,7 @@ using_webmap = False
 
 def add_to_cron():
     try:
-        from crontab import CronTabs
+        from crontab import CronTab
     except ImportError:
         subprocess.run(["pip3", "install", "python-crontab"], capture_output=True)
     from crontab import CronTab
