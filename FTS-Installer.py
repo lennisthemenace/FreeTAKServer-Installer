@@ -2,10 +2,74 @@ import subprocess
 import os
 import getpass
 
-VERSION = "0.3"
+VERSION = "0.4"
+
+WEBMAP_VERSION = "0.2.5"
+
+WEBMAP_URL = f"https://github.com/FreeTAKTeam/FreeTAKHub/releases/download/v{WEBMAP_VERSION}/FTH-webmap-linux-{WEBMAP_VERSION}.zip"
+
+DEFAULT_WEBMAP_LOCATION = "/opt/"
+
+RTSP_VERSION = "0.16.4"
+
+RTSP_URL = f"https://github.com/aler9/rtsp-simple-server/releases/download/v{RTSP_VERSION}/rtsp-simple-server_v{RTSP_VERSION}_linux_amd64.tar.gz"
 
 
-def add_to_cron():
+def install_webmap():
+    webmap_location = input(f"where do you want the webmap installed [{DEFAULT_WEBMAP_LOCATION}] ?")
+    if not webmap_location:
+        webmap_location = DEFAULT_WEBMAP_LOCATION
+    subprocess.run(["rm", f"{webmap_location}webmap.zip"])
+    subprocess.run(["rm", "-r", f"{webmap_location}webmap"])
+    webmap_download = subprocess.run(["wget", f"-O{webmap_location}webmap.zip", WEBMAP_URL])
+    print(webmap_download)
+    subprocess.run(["apt", "install", "unzip", "-y"])
+    subprocess.run(["unzip", f"{webmap_location}webmap.zip", f"-d{webmap_location}webmap"])
+    subprocess.run(["chmod", "+x", f"{webmap_location}webmap/FTH-webmap-linux-{WEBMAP_VERSION}"])
+    os.symlink(f"{webmap_location}webmap", "./FTS-WEBMAP", target_is_directory=True)
+    return 0
+
+
+def install_rtsp():
+    wget = subprocess.run(["wget", "-O", "/opt/rtsp-simple-server.tar.gz", RTSP_URL], capture_output=True)
+    print(wget)
+    tar = subprocess.run(["tar", "-xvf", "/opt/rtsp-simple-server.tar.gz", "-C", "/opt"])
+    return tar.returncode
+
+
+def add_webmap_to_cron():
+    try:
+        from crontab import CronTab
+    except ImportError:
+        subprocess.run(["pip3", "install", "python-crontab"], capture_output=True)
+    from crontab import CronTab
+    try:
+        cron = CronTab(user=getpass.getuser())
+        job = cron.new(command=f'nohup sudo /opt/webmap/FTH-webmap-linux-{WEBMAP_VERSION} &')
+        job.every_reboot()
+        cron.write()
+    except Exception:
+        return 1
+    return 0
+
+
+def add_rtsp_to_cron():
+    try:
+        from crontab import CronTab
+    except ImportError:
+        subprocess.run(["pip3", "install", "python-crontab"], capture_output=True)
+    from crontab import CronTab
+    try:
+        cron = CronTab(user=getpass.getuser())
+        job = cron.new(command='nohup sudo /opt/rtsp-simple-server &')
+        job.every_reboot()
+        cron.write()
+    except Exception:
+        return 1
+    return 0
+
+
+def add_fts_to_cron():
     try:
         from crontab import CronTab
     except ImportError:
@@ -36,7 +100,7 @@ def install_fts():
     return pip.returncode
 
 
-def link_dir():
+def link_fts_dir():
     python37_fts_path = "/usr/local/lib/python3.7/dist-packages/FreeTAKServer"
     python38_fts_path = "/usr/local/lib/python3.8/dist-packages/FreeTAKServer"
     if os.path.exists(python37_fts_path):
@@ -115,13 +179,33 @@ if __name__ == '__main__':
     #     exit(1)
     # print("------------------------------")
     print("Adding FreeTAKServer as a cron job")
-    if add_to_cron() != 0:
+    if add_fts_to_cron() != 0:
         print("Something went wrong!")
         exit(1)
     print("------------------------------")
     print("Creating symlinked directory to ./FTS")
-    if link_dir() != 0:
+    if link_fts_dir() != 0:
         print("Something went wrong!")
+    print("------------------------------")
+    print("FTS is Now Installed")
+    print("------------------------------")
+    rtsp_question = input("Would you like to install the RTSP server? y/n ")
+    if rtsp_question.lower() == "y":
+        if install_rtsp() == 0:
+            if add_rtsp_to_cron() == 0:
+                print("------------------------------")
+                print("RTSP Server installed")
+                print("------------------------------")
+    webmap_question = input("Would you like to install the Web Map? y/n ")
+    if webmap_question.lower() == "y":
+        if install_webmap() == 0:
+            if add_webmap_to_cron() == 0:
+                print("------------------------------")
+                print("Web Map installed")
+                print("------------------------------")
+    print("Running FreeTAKServer for the first time for Setup Wizard...")
+    print("When the server is running. Press 'Ctrl + C' Twice to exit, then reboot the machine")
+    subprocess.call(["python3", "-m", "FreeTAKServer.controllers.services.FTS"])
     print("------------------------------")
     print("------------------------------")
     print("---------Finished!------------")
