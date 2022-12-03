@@ -5,7 +5,7 @@ This tool is to make installing FreeTAKServer a one liner
 
 Just run:
 
-`curl -L https://git.io/JLSRp > install.py ; sudo python3 install.py`
+`curl -L https://raw.githubusercontent.com/lennisthemenace/FreeTAKServer-Installer/main/FTS-Installer.py > install.py ; sudo python3 install.py`
 
 Finally, reboot:
 
